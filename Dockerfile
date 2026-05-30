@@ -3,6 +3,17 @@ WORKDIR /app
 COPY composer.json composer.lock ./
 RUN composer install --no-dev --prefer-dist --no-interaction --optimize-autoloader --no-scripts
 
+FROM node:20-alpine AS frontend
+WORKDIR /app
+
+COPY package.json package-lock.json* ./
+RUN if [ -f package-lock.json ]; then npm ci; else npm install; fi
+
+COPY resources ./resources
+COPY public ./public
+COPY vite.config.js ./vite.config.js
+RUN npm run build
+
 FROM php:8.3-cli
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -23,6 +34,7 @@ WORKDIR /var/www/html
 
 COPY --from=vendor /app/vendor ./vendor
 COPY . .
+COPY --from=frontend /app/public/build ./public/build
 
 RUN mkdir -p storage/logs bootstrap/cache \
     && chown -R www-data:www-data storage bootstrap/cache
