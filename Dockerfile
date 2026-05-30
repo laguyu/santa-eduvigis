@@ -12,7 +12,7 @@ COPY public ./public
 COPY vite.config.js ./vite.config.js
 RUN npm run build
 
-FROM php:8.3-fpm
+FROM php:8.3-cli-alpine
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
@@ -40,7 +40,6 @@ RUN mkdir -p storage/logs bootstrap/cache \
 ENV APP_ENV=production
 ENV APP_DEBUG=false
 
-EXPOSE 8080
+EXPOSE 10000
 
-# Render detecta php-fpm y sirve public/ automáticamente
-CMD ["php-fpm"]
+CMD ["sh", "-c", "mkdir -p bootstrap/cache storage/app/public storage/framework/cache/data storage/framework/sessions storage/framework/views; php artisan storage:link || true; php artisan migrate --force || true; if [ \"${RUN_DEMO_SEED:-true}\" = \"true\" ]; then php artisan db:seed --force || true; elif [ \"${RUN_AUTH_SEED:-false}\" = \"true\" ]; then php artisan db:seed --class=Database\\Seeders\\AuthUsersSeeder --force || true; fi; php artisan serve --host 0.0.0.0 --port ${PORT:-10000}"]
