@@ -5,16 +5,14 @@ RUN composer install --no-dev --prefer-dist --no-interaction --optimize-autoload
 
 FROM node:20-alpine AS frontend
 WORKDIR /app
-
 COPY package.json package-lock.json* ./
 RUN if [ -f package-lock.json ]; then npm ci; else npm install; fi
-
 COPY resources ./resources
 COPY public ./public
 COPY vite.config.js ./vite.config.js
 RUN npm run build
 
-FROM php:8.3-cli
+FROM php:8.3-fpm
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
@@ -39,12 +37,10 @@ COPY --from=frontend /app/public/build ./public/build
 RUN mkdir -p storage/logs bootstrap/cache \
     && chown -R www-data:www-data storage bootstrap/cache
 
-COPY docker/start.sh /usr/local/bin/start.sh
-RUN chmod +x /usr/local/bin/start.sh
-
 ENV APP_ENV=production
 ENV APP_DEBUG=false
 
-EXPOSE 10000
+EXPOSE 8080
 
-CMD ["start.sh"]
+# Render detecta php-fpm y sirve public/ automáticamente
+CMD ["php-fpm"]
