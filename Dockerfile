@@ -14,19 +14,17 @@ RUN npm run build
 
 FROM php:8.3-cli-alpine
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
+RUN apk add --no-cache \
     git \
     unzip \
     libzip-dev \
-    libonig-dev \
+    oniguruma-dev \
     libpng-dev \
-    libjpeg62-turbo-dev \
-    libfreetype6-dev \
+    libjpeg-turbo-dev \
+    freetype-dev \
     libxml2-dev \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install -j"$(nproc)" pdo_mysql mbstring bcmath exif gd \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+    && docker-php-ext-install -j"$(nproc)" pdo_mysql mbstring bcmath exif gd
 
 WORKDIR /var/www/html
 
