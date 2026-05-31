@@ -40,4 +40,4 @@ ENV APP_DEBUG=false
 
 EXPOSE 10000
 
-CMD ["sh", "-c", "mkdir -p bootstrap/cache storage/app/public storage/framework/cache/data storage/framework/sessions storage/framework/views; php artisan storage:link || true; php artisan migrate --force || true; if [ \"${RUN_DEMO_SEED:-true}\" = \"true\" ]; then php artisan db:seed --force || true; elif [ \"${RUN_AUTH_SEED:-false}\" = \"true\" ]; then php artisan db:seed --class=Database\\Seeders\\AuthUsersSeeder --force || true; fi; php -S 0.0.0.0:10000 -t public public/index.php"]
+CMD ["sh", "-c", "php artisan config:clear && mkdir -p bootstrap/cache storage/app/public storage/framework/cache/data storage/framework/sessions storage/framework/views; php artisan storage:link || true; php artisan migrate --force || true; if [ \"${RUN_DEMO_SEED:-true}\" = \"true\" ]; then php artisan db:seed --force || true; elif [ \"${RUN_AUTH_SEED:-false}\" = \"true\" ]; then php artisan db:seed --class=Database\\Seeders\\AuthUsersSeeder --force || true; fi; php -S 0.0.0.0:10000 -t public public/index.php"]
