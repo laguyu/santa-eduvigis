@@ -39,7 +39,7 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 COPY --from=vendor /app/vendor ./vendor
 # Copiar todo el código fuente
 COPY . .
-# Copiar los assets generados
+# Copiar los assets generados (esto debe ir después para no ser sobrescritos)
 COPY --from=assets /app/public/build ./public/build
 
 RUN mkdir -p storage/logs bootstrap/cache \
